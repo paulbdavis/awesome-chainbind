@@ -70,6 +70,56 @@
     )
   #+end_src
 
+  You can also supply widgets for chainbind to render in rather than having it make it's own wibar (there's probably a better way here..)
+
+  #+begin_src lua
+    local chainbind_widgets = {}
+
+    awful.screen.connect_for_each_screen(function(s)
+          -- Create the wibox
+          s.mywibox = awful.wibar({
+                position = "bottom",
+                screen = s,
+                opacity = 0.93,
+          })
+
+          chainbind_widgets[s.index] = wibox.container.background()
+
+          -- Add widgets to the wibox
+          s.mywibox:setup {
+             layout = wibox.layout.align.horizontal,
+             { -- Left widgets
+                layout = wibox.layout.fixed.horizontal,
+                s.mytaglist,
+                s.mypromptbox,
+             },
+             {
+                {
+                   widget=chainbind_widgets[s.index],
+                },
+                s.mytasklist, -- Middle widget
+                layout = wibox.layout.align.horizontal,
+             },
+             { -- Right widgets
+                layout = wibox.layout.fixed.horizontal,
+                wibox.widget.systray(),
+                mytextclock,
+                s.mylayoutbox,
+             },
+          }
+    end)
+
+    globalkeys = gears.table.join(
+       chainbind.create{
+          {"Control"}, "t",
+          name = "Root",
+          bind_trigger = true,
+          map = root_map,
+          display_widget = chainbind_widgets,
+          left_offset = 0,
+       }
+    )
+  #+end_src
   
 
 * Theming
