@@ -1,0 +1,88 @@
+#+TITLE: awesome-chainbind
+
+* Setup
+
+  #+begin_src lua
+    local chainbind = require("chainbind")
+
+    globalkeys = gears.table.join(
+
+       -- you may want to leave the mod bindings in as a backup, this should not interfere with them
+
+       chainbind.create{
+          {"Control"}, "t",
+          name = "Root",
+          -- When bind_trigger is true, this will automatically map the
+          -- bare trigger key to send the literal trigger. In this example
+          -- hitting `C-t t` would send a `C-t` to the focused client.
+          -- This is only available on the root map
+          bind_trigger = true,
+          map = {
+             -- mappings with an action will end the chain and run the function (no arguments currently)
+             { {}, "Return", action = my_spawn_vterm, description = "Terminal" },
+             { {}, " ", action = menubar.show, description = "Launch" },
+         
+             { {}, "k", action = function() client.focus:kill() end, description = "Kill" },
+             { {}, "x", action = my_make_master, description = "Make Master"},
+             { {}, "u", action = awful.client.urgent.jumpto, description = "Jump to urgent"},
+             { {}, "-", action = my_minimize, description = "Minimize"},
+             { {"Shift"}, "_", action = my_restore_minimized, description = "Restore"},
+             { {}, "o", action = function() awful.client.focus.byidx(1) end, description = "Next Client" },
+         
+             -- when using shift, make sure to use the shifted version of the key for the second arg, see note below about looping
+             { {"Shift"}, "O", action = function() awful.client.focus.byidx(-1) end, description = "Previous Client" },
+
+             -- actions with no_stop = true will not stop the chain and will allow another action to be run
+             { {}, "r", action = my_repeatable, description = "Repeatable Action", no_stop = true},
+         
+             -- submap example
+             { {}, "g",
+                name = "Tags",
+                map = {
+                   -- sub maps can be chained as far as you want, I guess...
+                   { {}, "m",
+                      name = "Move", map = {
+                         -- blah blah
+                      }
+                   },
+               
+                   { {}, "o", action = function() awful.tag.history.restore() end, description = "Previous Tag" },
+
+                   -- I haven't figured out how to loop this the way it's
+                   -- done for the tag bindings in the default rc. I'm
+                   -- guessing that keygrabber:add_keybinding does not
+                   -- respond the same way awful.key does to the "#n"
+                   -- keybindings
+                   { {}, "1", action = function() my_view_tag(1) end, description = "Tag 1" },
+                   { {}, "2", action = function() my_view_tag(2) end, description = "Tag 2" },
+                   -- etc...
+                   { {"Shift"}, "!", action = function() my_toggle_tag(1) end, description = "Toggle Tag 1" },
+                   { {"Shift"}, "@", action = function() my_toggle_tag(2) end, description = "Toggle Tag 2" },
+                }
+             },
+         
+             -- you'd most likely define submaps above and add like this,
+             -- same for the root map and the "Move" submap on the tag map
+             { {}, "l", name = "Layout", map = layout_map },
+         
+          },
+       }
+    )
+  #+end_src
+
+  
+
+* Theming
+
+  #+begin_src lua
+    theme.chainbind_font
+    theme.chainbind_bind_description_bg
+    theme.chainbind_bind_description_fg
+    theme.chainbind_submap_description_bg
+    theme.chainbind_submap_description_fg
+    theme.chainbind_key_fg
+
+    theme.chainbind_color_cycle = {
+       -- list of colors to cycle through for sub maps
+    }
+  #+end_src
