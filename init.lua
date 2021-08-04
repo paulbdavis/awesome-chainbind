@@ -303,15 +303,24 @@ local function send_trigger(self, mods, key)
       root.fake_input('key_release'  , m)
    end
    
+   -- os.execute("sleep 0.1")
+   
    for i, m in ipairs(translated_mods) do
       -- print("pressing "..m)
       root.fake_input('key_press'  , m)
    end
    
+   -- os.execute("sleep 0.05")
+   
    -- print("pressing "..key)
    root.fake_input('key_press', key)
+   
+   -- os.execute("sleep 0.1")
+   
    -- print("releasing "..key)
    root.fake_input('key_release', key)
+   
+   -- os.execute("sleep 0.05")
    
    for i, m in ipairs(translated_mods) do
       -- print("releasing "..m)
